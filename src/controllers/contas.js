@@ -37,7 +37,7 @@ const criarConta = (req, res) => {
     numConta++;
 
     contas.push(novaContaCadastrar);
-    return res.status(200).json();
+    return res.status(204).json(); //Código 204 para respostas sem conteúdo no body.
 
 };
 
@@ -47,7 +47,6 @@ const atualizarUsuario = (req, res) => {
 
     //Validação - Existência do número da conta passado como parametro na URL
     const contaAlterar = contas.find((conta) => {
-        console.log(conta.numero === Number(numeroConta))
         return (conta.numero === Number(numeroConta));
     })
     if (!contaAlterar) {
@@ -74,14 +73,31 @@ const atualizarUsuario = (req, res) => {
     contaAlterar.usuario.email = novosDadosUsuario.email;
     contaAlterar.usuario.senha = novosDadosUsuario.senha;
 
-    return res.status(200).json();
+    return res.status(204).json();
 
 }
 
+const deletarConta = (req, res) => {
+    const { numeroConta } = req.params;
+    //Validação - Existência do número da conta passado como parametro na URL
+    const contaExcluir = contas.find((conta) => {
+        return (conta.numero === Number(numeroConta));
+    })
+    if (!contaExcluir) {
+        return res.status(404).json({ message: 'O número da conta informado não existe.' })
+    }
+
+    contas = contas.filter((conta) => {
+        return conta.numero != Number(numeroConta);
+    }); //Filtrando o array de contas retirando apenas o que se deseja deletar.
+
+    res.status(204).json();
+}
 
 
 module.exports = {
     listarContas,
     criarConta,
-    atualizarUsuario
+    atualizarUsuario,
+    deletarConta
 }
