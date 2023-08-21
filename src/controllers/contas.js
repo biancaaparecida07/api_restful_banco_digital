@@ -1,4 +1,4 @@
-let { contas } = require('../../database/bancodedados')
+let { contas } = require('../../database/bancodedados');
 let numConta = 1;
 
 const listarContas = (req, res) => {
@@ -28,7 +28,7 @@ const criarConta = (req, res) => {
     }
 
     const novaContaCadastrar = {
-        numConta: numConta,
+        numero: numConta,
         saldo: saldo,
         usuario: novaConta
     }
@@ -41,7 +41,34 @@ const criarConta = (req, res) => {
 
 };
 
+const atualizarUsuario = (req, res) => {
+    const { numeroConta } = req.params;
+    let novosDadosUsuario = req.body;
+
+    //Validação - Existência do número da conta passado como parametro na URL
+    const contaAlterar = contas.find((conta) => {
+        return (contas.numero === numeroConta);
+    })
+    if (!contaAlterar) {
+        return res.status(404).json({ message: 'O número da conta informado não existe. ' })
+    }
+
+    // Validação - CPF for informado já registrado em outra conta
+    if (novosDadosUsuario.cpf || novosDadosUsuario.email) {
+        const usuario = contas.find((usuario) => {
+            return ((usuario.cpf === novosDadosUsuario.cpf) || (usuario.email === novosDadosUsuario.email));
+        })
+
+        if (!usuario) {
+            return res.status(400).json({ message: 'Já existe uma conta com o cpf ou e-mail informado!' })
+        }
+    }
+}
+
+
+
 module.exports = {
     listarContas,
-    criarConta
+    criarConta,
+    atualizarUsuario
 }
