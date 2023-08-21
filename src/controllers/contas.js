@@ -47,22 +47,35 @@ const atualizarUsuario = (req, res) => {
 
     //Validação - Existência do número da conta passado como parametro na URL
     const contaAlterar = contas.find((conta) => {
-        return (contas.numero === numeroConta);
+        console.log(conta.numero === Number(numeroConta))
+        return (conta.numero === Number(numeroConta));
     })
     if (!contaAlterar) {
-        return res.status(404).json({ message: 'O número da conta informado não existe. ' })
+        return res.status(404).json({ message: 'O número da conta informado não existe.' })
     }
 
     // Validação - CPF for informado já registrado em outra conta
-    if (novosDadosUsuario.cpf || novosDadosUsuario.email) {
-        const usuario = contas.find((usuario) => {
-            return ((usuario.cpf === novosDadosUsuario.cpf) || (usuario.email === novosDadosUsuario.email));
-        })
-
-        if (!usuario) {
+    for (let i = 0; i < contas.length; i++) {
+        if ((novosDadosUsuario.cpf === contas[i].usuario.cpf) || (novosDadosUsuario.email === contas[i].usuario.email)) {
             return res.status(400).json({ message: 'Já existe uma conta com o cpf ou e-mail informado!' })
         }
     }
+
+    //Validação - Todos os campos passados no body
+    if (!novosDadosUsuario.nome || !novosDadosUsuario.cpf || !novosDadosUsuario.data_nascimento || !novosDadosUsuario.telefone || !novosDadosUsuario.email || !novosDadosUsuario.senha) {
+        return res.status(400).json({ message: 'Campo obrigatório não declarado ou em branco. A conta não foi criada!' })
+    }
+
+    //Atualização dos dados
+    contaAlterar.usuario.nome = novosDadosUsuario.nome;
+    contaAlterar.usuario.cpf = novosDadosUsuario.cpf;
+    contaAlterar.usuario.data_nascimento = novosDadosUsuario.data_nascimento;
+    contaAlterar.usuario.telefone = novosDadosUsuario.telefone;
+    contaAlterar.usuario.email = novosDadosUsuario.email;
+    contaAlterar.usuario.senha = novosDadosUsuario.senha;
+
+    return res.status(200).json();
+
 }
 
 
