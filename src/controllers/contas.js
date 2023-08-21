@@ -87,13 +87,17 @@ const deletarConta = (req, res) => {
         return res.status(404).json({ message: 'O número da conta informado não existe.' })
     }
 
-    contas = contas.filter((conta) => {
-        return conta.numero != Number(numeroConta);
-    }); //Filtrando o array de contas retirando apenas o que se deseja deletar.
+    //Validação - Saldo zero para permitir exclusão.
+    if (contaExcluir.saldo === 0) {
+        contas = contas.filter((conta) => {
+            return conta.numero != Number(numeroConta);
+        }); //Filtrando o array de contas retirando apenas o que se deseja deletar.
+    } else {
+        return res.status(403).json({ message: '"A conta só pode ser removida se o saldo for zero!"' })
+    }
 
     res.status(204).json();
 }
-
 
 module.exports = {
     listarContas,
