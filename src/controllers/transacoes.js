@@ -1,4 +1,4 @@
-let { contas, depositos, saques } = require('../../database/bancodedados');
+let { contas, depositos, saques, transferencias } = require('../../database/bancodedados');
 
 const depositar = (req, res) => {
     const { numero_conta, valor } = req.body;
@@ -75,7 +75,53 @@ const sacar = (req, res) => {
 }
 
 const transferir = (req, res) => {
+    const { numero_conta_origem, numero_conta_destino, valor, senha } = req.body;
 
+    //Validação - Dados disponíveis no body
+    if (!numero_conta_origem || !numero_conta_destino || valor == undefined || !senha) {
+        return res.status(400).json({ message: 'Os dados das contas, valor e senha são obrigatórios!' })
+    }
+
+    //Validação - Existência das contas
+    const contaOrigem = contas.find((conta) => {
+        return (conta.numero === Number(numero_conta_origem));
+    })
+    if (!contaOrigem) {
+        return res.status(404).json({ message: 'O número da conta informado não existe.' })
+    }
+
+    const contaDestino = contas.find((conta) => {
+        return (conta.numero === Number(numero_conta_destino));
+    })
+    if (!contaDestino) {
+        return res.status(404).json({ message: 'O número da conta informado não existe.' })
+    }
+
+    //Validação de senha - Conta de Origem
+    if (contaOrigem.usuario.senha != senha) {
+        return res.status(401).json({ message: 'Senha incorreta!' });
+    }
+
+    //Validação - Valor a ser retirado
+    if (valor <= 0) {
+        return res.status(403).json({ message: 'Não é permitido depósito de valor igual ou menor que zero.' })
+    }
+
+    if (contaOrigem.saldo < valor) {
+        return res.status(403).json({ message: 'Saldo insuficiente!' });
+    } else {
+        contaOrigem.saldo -= valor;
+        contaDestino.saldo += valor;
+        const dataTransf = new Date();
+        const registro = {
+            data: dataTransf,
+            numero_conta_origem: numero_conta_origem,
+            numero_conta_destino: numero_conta_destino,
+            valor: valor
+        }
+        transferencias.push(registro);
+        return res.status(204).json();
+    }
 }
 
 module.exports = {
