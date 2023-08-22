@@ -99,9 +99,18 @@ const deletarConta = (req, res) => {
     res.status(204).json();
 }
 
+const obterSaldo = (req, res) => {
+
+}
+
+const obterExtrato = (req, res) => {
+
+}
 module.exports = {
     listarContas,
     criarConta,
     atualizarUsuario,
-    deletarConta
+    deletarConta,
+    obterSaldo,
+    obterExtrato
 }
