@@ -100,10 +100,29 @@ const deletarConta = (req, res) => {
 }
 
 const obterSaldo = (req, res) => {
+    const { numero_conta, senha } = req.query;
 
+    if (!numero_conta || !senha) {
+        return res.status(400).json({ message: 'O número da conta ou senha são obrigatórios!' })
+    }
+
+    //Validação - Existência da conta
+    const conta = contas.find((conta) => {
+        return (conta.numero === Number(numero_conta));
+    })
+    if (!conta) {
+        return res.status(404).json({ message: 'Conta bancária não encontada!' })
+    }
+
+    if (conta.usuario.senha !== senha) {
+        return res.status(401).json({ message: 'Senha incorreta!' });
+    }
+
+    return res.status(200).json(`Saldo: ${conta.saldo}`)
 }
 
 const obterExtrato = (req, res) => {
+
 
 }
 module.exports = {
