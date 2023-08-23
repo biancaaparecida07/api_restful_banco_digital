@@ -1,4 +1,5 @@
 let { contas, depositos, saques, transferencias } = require('../../database/bancodedados');
+const { format } = require('date-fns');
 
 const depositar = (req, res) => {
     const { numero_conta, valor } = req.body;
@@ -22,14 +23,13 @@ const depositar = (req, res) => {
     }
     const dataDeposito = new Date();
     const registro = {
-        data: dataDeposito,
+        data: format(dataDeposito, 'yyyy-MM-dd HH:mm:ss'),
         numero_conta: numero_conta,
         valor: valor
     }
 
     contaDepositar.saldo += valor;
     depositos.push(registro);
-    console.log(depositos);
     return res.status(204).json();
 
 }
@@ -66,7 +66,7 @@ const sacar = (req, res) => {
         contaSacar.saldo -= valor;
         const dataSaque = new Date();
         const registro = {
-            data: dataSaque,
+            data: format(dataSaque, 'yyyy-MM-dd HH:mm:ss'),
             numero_conta: numero_conta,
             valor: valor
         }
@@ -115,7 +115,7 @@ const transferir = (req, res) => {
         contaDestino.saldo += valor;
         const dataTransf = new Date();
         const registro = {
-            data: dataTransf,
+            data: format(dataTransf, 'yyyy-MM-dd HH:mm:ss'),
             numero_conta_origem: numero_conta_origem,
             numero_conta_destino: numero_conta_destino,
             valor: valor
