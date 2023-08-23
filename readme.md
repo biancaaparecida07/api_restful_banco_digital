@@ -11,7 +11,7 @@ git clone https://github.com/biancaaparecida07/api_restful_banco_digital
 ```  
 2. Abrir a pasta do projeto:
 ```bash
-cd desafio-backend-m02-b2bt05
+cd api_restful_banco_digital
 ```  
 3. Instalar dependências:  
 ```bash
