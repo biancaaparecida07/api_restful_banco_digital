@@ -29,6 +29,7 @@ const depositar = (req, res) => {
 
     contaDepositar.saldo += valor;
     depositos.push(registro);
+    console.log(depositos);
     return res.status(204).json();
 
 }

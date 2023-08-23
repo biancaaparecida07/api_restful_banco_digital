@@ -1,4 +1,4 @@
-let { contas } = require('../../database/bancodedados');
+let { contas, depositos, transferencias, saques } = require('../../database/bancodedados');
 let numConta = 1;
 
 const listarContas = (req, res) => {
@@ -122,7 +122,51 @@ const obterSaldo = (req, res) => {
 }
 
 const obterExtrato = (req, res) => {
+    const { numero_conta, senha } = req.query;
 
+    if (!numero_conta || !senha) {
+        return res.status(400).json({ message: 'O número da conta ou senha são obrigatórios!' })
+    }
+
+    //Validação - Existência da conta
+    const conta = contas.find((conta) => {
+        return (conta.numero === Number(numero_conta));
+    })
+    if (!conta) {
+        return res.status(404).json({ message: 'Conta bancária não encontada!' })
+    }
+
+    if (conta.usuario.senha !== senha) {
+        return res.status(401).json({ message: 'Senha incorreta!' });
+    }
+
+    const relatorioDepositos = depositos.filter((deposito) => {
+        return deposito.numero_conta === numero_conta;
+
+    })
+
+    const relatorioSaques = saques.filter((saque) => {
+        return saque.numero_conta === numero_conta;
+    })
+
+    const relatorioTransferenciasEnviadas = transferencias.filter((transfEnv) => {
+        return transfEnv.numero_conta_origem === numero_conta;
+
+    })
+
+    const relatorioTransferenciasRecebidas = transferencias.filter((transfRec) => {
+        return transfRec.numero_conta_destino === numero_conta;
+
+    })
+
+    const relatorioCompleto = {
+        depositos: relatorioDepositos,
+        saques: relatorioSaques,
+        transferenciasEnviadas: relatorioTransferenciasEnviadas,
+        transferenciasRecebidas: relatorioTransferenciasRecebidas
+    }
+
+    res.status(200).json(relatorioCompleto);
 
 }
 module.exports = {
